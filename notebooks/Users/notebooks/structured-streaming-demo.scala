@@ -52,6 +52,33 @@ val streamGroupBy=streamQuery.filter($"gt"=!="null").groupBy(window($"new_creati
 // COMMAND ----------
 
 //sliding window example
+val streamGroupBySlidingWindow=streamQuery.filter($"gt"=!="null").groupBy(window($"new_creation_time","2 minutes","1 minutes"),$"gt").count
+
+// COMMAND ----------
+
+val finalSlidingWindowQuery=streamGroupBySlidingWindow.writeStream.format("memory").queryName("activityTableSldingWindow").outputMode("complete").start()
+
+// COMMAND ----------
+
+spark.sql("select * from activityTableSldingWindow").show
+
+// COMMAND ----------
+
+//with watermark
+//sliding window example
+val streamGroupBySlidingWindowWithWatermark=streamQuery.filter($"gt"=!="null").withWatermark("new_creation_time","2 minutes").groupBy(window($"new_creation_time","2 minutes","1 minutes"),$"gt").count
+
+// COMMAND ----------
+
+
+
+// COMMAND ----------
+
+val queryWithWatermark=streamGroupBySlidingWindowWithWatermark.writeStream.format("memory").queryName("val queryWithWatermark=streamGroupBySlidingWindowWithWatermark.writeStream.format("memory").queryName("activityTableWithWatermark").outputMode("complete").start()").outputMode("complete").start()
+
+// COMMAND ----------
+
+spark.sql("select * from activityTableWithWatermark").show
 
 // COMMAND ----------
 
